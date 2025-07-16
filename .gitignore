@@ -1,3 +1,7 @@
 pyenv/
 *.pdf
 *.md
+.env
+Misc/
+__pycache__/
+__init__.py

@@ -32,46 +32,46 @@ def analyze_job_with_mistral(job_text, api_key, resume_path=None):
 
     # Create the prompt for resume tailoring suggestions
     prompt = f"""
-You are an expert in resume tailoring for software engineering and other technical roles.
+            You are an expert in resume tailoring for software engineering and other technical roles.
 
-Please analyze the job posting and current resume provided. Give specific, actionable feedback to tailor the resume effectively for this position. Focus on skills, technologies, accomplishments, and keywords that matter for technical hiring.
+            Please analyze the job posting and current resume provided. Give specific, actionable feedback to tailor the resume effectively for this position. Focus on skills, technologies, accomplishments, and keywords that matter for technical hiring.
 
-CURRENT RESUME:
-{resume_text if resume_text else "No resume provided."}
+            CURRENT RESUME:
+            {resume_text if resume_text else "No resume provided."}
 
-JOB POSTING:
-{job_content}
+            JOB POSTING:
+            {job_content}
 
-Please return:
+            Please return:
 
-1. Core Technical Skills & Qualifications Required
-   List the main programming languages, tools, frameworks, systems, or certifications mentioned.
+            1. Core Technical Skills & Qualifications Required
+            List the main programming languages, tools, frameworks, systems, or certifications mentioned.
 
-2. Critical Keywords & Phrases to Include
-   Extract high-impact terms and acronyms to match applicant tracking systems (ATS).
+            2. Critical Keywords & Phrases to Include
+            Extract high-impact terms and acronyms to match applicant tracking systems (ATS).
 
-3. Must-Have Experience or Background
-   Note any specific years of experience, domains (e.g., fintech, cloud), or project types expected.
+            3. Must-Have Experience or Background
+            Note any specific years of experience, domains (e.g., fintech, cloud), or project types expected.
 
-4. Valued Soft Skills (Only if emphasized)
-   Include only those soft skills that appear directly in the job posting and are relevant to engineers (e.g., "collaborates with cross-functional teams").
+            4. Valued Soft Skills (Only if emphasized)
+            Include only those soft skills that appear directly in the job posting and are relevant to engineers (e.g., "collaborates with cross-functional teams").
 
-5. Tailoring Recommendations
+            5. Tailoring Recommendations
 
-   * Which resume sections to emphasize or reorder
-   * Specific bullet points to revise or add
-   * How to mirror the job posting language without being redundant
-   * Remove or downplay any content not aligned with this role
-   * Omit generic introductions or summaries unless required
+            * Which resume sections to emphasize or reorder
+            * Specific bullet points to revise or add
+            * How to mirror the job posting language without being redundant
+            * Remove or downplay any content not aligned with this role
+            * Omit generic introductions or summaries unless required
 
-Additional Instructions for Tailoring to Tech Roles:
+            Additional Instructions for Tailoring to Tech Roles:
 
-* Keep the resume concise (1 page if under 10 years' experience)
-* Focus on results: use quantifiable metrics (e.g., "reduced load time by 40%")
-* Prioritize *what you built, how you built it, and the impact*
-* Use active, technical verbs (e.g., “developed”, “optimized”, “deployed”, “automated”)
-* Avoid vague soft skills unless clearly demanded
-"""
+            * Keep the resume concise (1 page if under 10 years' experience)
+            * Focus on results: use quantifiable metrics (e.g., "reduced load time by 40%")
+            * Prioritize *what you built, how you built it, and the impact*
+            * Use active, technical verbs (e.g., “developed”, “optimized”, “deployed”, “automated”)
+            * Avoid vague soft skills unless clearly demanded
+    """
     try:
         #Make the API call
         response = client.chat.stream(
@@ -118,11 +118,6 @@ def job_posting(url, api_key=None, resume_path=None):
     full_text = soup.get_text(separator="\n")
     lines = full_text.splitlines()
     lines = [line.strip() for line in lines if line.strip()]  # Remove empty lines
-    #--------Logic to extract specific sections can be added here-----------------
-    # for line in lines:
-    #     if "Qualifications" in line or "Responsibilities" in line:
-    #         print(line)
-    #--------------------------------------------------------------------------------
     recommendations = analyze_job_with_mistral(job_text=lines,
                                                 api_key=api_key, resume_path=resume_path)
 
