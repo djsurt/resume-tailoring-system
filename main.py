@@ -2,11 +2,9 @@ import os
 import io
 import uvicorn
 from dotenv import load_dotenv
-
 from fastapi import FastAPI, Form, File, UploadFile, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
-
 import requests
 from bs4 import BeautifulSoup
 import pdfplumber
@@ -106,18 +104,34 @@ async def stream_analysis_from_mistral(job_content: str, resume_text: str | None
         * **Content to Remove:** What to downplay or remove.
     """
     try:
-        async for chunk in client.chat.stream(
-            model="mistral-large-latest", #Might need to change this
+        response = await client.chat.stream_async(
+            model="mistral-large-latest",
             messages=[
-                {"role": "user", "content": prompt}
-            ]
-        ):
-            if chunk.choices[0].delta.content is not None:
-                content = chunk.choices[0].delta.content
-                yield content
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ],
+            temperature=0.3
+        )
+        async for chunk in response:
+            try:
+                delta = chunk.data.choices[0].delta
+                if delta and delta.content:
+                    yield delta.content
+            except AttributeError:
+                # Likely a CompletionEvent or something else with no choices
+                continue
+
     except Exception as e:
-        print(f"Error during Mistral API call: {e}")
-        raise HTTPException(status_code=500, detail=f"Error during analysis: {e}")
+        raise HTTPException(status_code=500, detail=f"Error communicating with Mistral API: {e}")
+
+@app.get("/")
+async def root():
+    """
+    A simple root endpoint to check if the API is running.
+    """
+    return {"message": "Welcome to the Resume Tailoring System API!"}
 
 @app.post("/analyze/")
 async def analyze_job_and_resume(
@@ -134,7 +148,7 @@ async def analyze_job_and_resume(
         response.raise_for_status()  # Raise an error for bad responses
         soup = BeautifulSoup(response.text, 'html.parser')
         full_text = soup.get_text(separator="\n")
-        job_lines = [line.strip for line in full_text.splitlines() if line.strip()]
+        job_lines = [line.strip() for line in full_text.splitlines() if line.strip()]
         job_content = "\n".join(job_lines)
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Could not fetch job posting: {e}")
