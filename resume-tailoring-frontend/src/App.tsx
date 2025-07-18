@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './App.css'
+import Markdown from 'react-markdown'
 
 function App() {
   const [jobUrl, setJobUrl] = useState<string>('')
@@ -30,6 +31,7 @@ function App() {
       </form>
       {error && <div className='error'>{error}</div>}
       <div className='output'> 
+        <Markdown>{output}</Markdown>
       </div>
     </div>
   )
