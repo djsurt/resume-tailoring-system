@@ -39,7 +39,7 @@ function App() {
         if(value) setOutput((prev) => prev + decoder.decode(value))
       }
     } catch(err: any){
-      setError(err.nessage)
+      setError(err.message)
     } finally{
       setLoading(false)
     }
@@ -47,27 +47,40 @@ function App() {
 
   return (
     <div className='container'>
-      <h1>Resume Tailoring System</h1>
-      <form onSubmit={handleSubmit} className='form'>
-        <input
-        type='url'
-        placeholder="Job Posting URL"
-        value={jobUrl}
-        onChange={(e) => setJobUrl(e.target.value)}
-        required
-        />
-        <input
-        type='file'
-        accept='application/pdf'
-        onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
-        />
-        <button type='submit' disabled={loading}>
-          {loading ? 'Analyzing...' : 'Analyze'}
-        </button>
-      </form>
-      {error && <div className='error'>{error}</div>}
-      <div className='output'> 
-        <Markdown>{output}</Markdown>
+      {/* Left Panel - Form */}
+      <div className='left-panel'>
+        <h1>Resume Tailoring System</h1>
+        <form onSubmit={handleSubmit} className='form'>
+          <input
+            type='url'
+            placeholder="Job Posting URL"
+            value={jobUrl}
+            onChange={(e) => setJobUrl(e.target.value)}
+            required
+          />
+          <input
+            type='file'
+            accept='application/pdf'
+            onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
+          />
+          <button type='submit' disabled={loading}>
+            {loading ? 'Analyzing...' : 'Analyze'}
+          </button>
+        </form>
+        {error && <div className='error'>{error}</div>}
+      </div>
+      
+      {/* Right Panel - Output */}
+      <div className='right-panel'>
+        <div className='output'> 
+          {output ? (
+            <Markdown>{output}</Markdown>
+          ) : (
+            <div className='output-placeholder'>
+              Generated content will appear here after analysis
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
