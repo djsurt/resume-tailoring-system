@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import './App.css'
 import Markdown from 'react-markdown'
+import Navbar from './components/Navbar'
 
 function App() {
   const [jobUrl, setJobUrl] = useState<string>('')
@@ -46,43 +47,63 @@ function App() {
   }
 
   return (
-    <div className='container'>
+    /* Main container, with full screen layout and flexbox */
+    <div className="min-h-screen flex-col bg-green-50">
+      <Navbar />
+      <div className='flex flex-1'>
       {/* Left Panel - Form */}
-      <div className='left-panel'>
-        <h1>Resume Tailoring System</h1>
-        <form onSubmit={handleSubmit} className='form'>
-          <input
-            type='url'
-            placeholder="Job Posting URL"
-            value={jobUrl}
-            onChange={(e) => setJobUrl(e.target.value)}
-            required
-          />
-          <input
-            type='file'
-            accept='application/pdf'
-            onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
-          />
-          <button type='submit' disabled={loading}>
-            {loading ? 'Analyzing...' : 'Analyze'}
-          </button>
-        </form>
-        {error && <div className='error'>{error}</div>}
-      </div>
+        <div className='w-1/3 bg-white shadow-lg p-6'>
+          <h1 className='text-2xl font-bold text-gray-800 mb-6'>Resume Tailoring System</h1>
+          <div className='space-y-4'>
+            <div>
+                <input
+                  type='url'
+                  placeholder="Job Posting URL"
+                  className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all'
+                  value={jobUrl}
+                  onChange={(e) => setJobUrl(e.target.value)}
+                  required
+                />
+            </div>
+            <div>
+              <input
+                type='file'
+                accept='application/pdf'
+                className='className="w-full px-4 py-3 border border-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all"'
+                onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
+              />
+            </div>
+            <div>
+              <button type='submit' disabled={loading}
+              onClick={handleSubmit}
+              className='w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors font-medium'>
+                {loading ? 'Analyzing...' : 'Analyze'}
+              </button>
+            </div>
+          </div>
+          {error && <div className='mt-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg'>
+            {error}
+          </div>}
+        </div>
       
       {/* Right Panel - Output */}
-      <div className='right-panel'>
-        <div className='output'> 
-          {output ? (
-            <Markdown>{output}</Markdown>
-          ) : (
-            <div className='output-placeholder'>
-              Generated content will appear here after analysis
-            </div>
-          )}
+        <div className='flex-1 p-6'>
+          <div className='h-full bg-white rounded-lg shadow-sm border border-gray-200 p-6 overflow-auto'> 
+            {output ? (
+              <Markdown>{output}</Markdown>
+            ) : (
+              <div className="h-full flex items-center justify-center text-gray-500 text-center">
+                <div>
+                  <div className="text-4xl mb-4">📄</div>
+                  <p className="text-lg">Generated content will appear here after analysis</p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
+    
   )
 }
 
