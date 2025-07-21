@@ -48,11 +48,11 @@ function App() {
 
   return (
     /* Main container, with full screen layout and flexbox */
-    <div className="min-h-screen flex-col bg-green-50">
+    <div className="min-h-screen flex flex-col bg-green-50 gap-6">
       <Navbar />
-      <div className='flex flex-1'>
+      <div className=' flex flex-1'>
       {/* Left Panel - Form */}
-        <div className='w-1/3 bg-white shadow-lg p-6'>
+        <div className='w-1/3 bg-white border border-gray-200 shadow-sm p-6 rounded-t-lg'>
           <h1 className='text-2xl font-bold text-gray-800 mb-6'>Resume Tailoring System</h1>
           <div className='space-y-4'>
             <div>
@@ -87,8 +87,8 @@ function App() {
         </div>
       
       {/* Right Panel - Output */}
-        <div className='flex-1 p-6'>
-          <div className='h-full bg-white rounded-lg shadow-sm border border-gray-200 p-6 overflow-auto'> 
+        <div className='flex-1 p-6 min-h-0  flex flex-col'>
+          <div className='flex-1 bg-white rounded-lg shadow-sm border border-gray-200 p-6 overflow-auto'>
             {output ? (
               <Markdown>{output}</Markdown>
             ) : (
