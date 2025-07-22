@@ -17,6 +17,7 @@ function App() {
     setLoading(true)
     console.log("Submitting")
     console.log(loading)
+
     const formData = new FormData()
     formData.append('job_url', jobUrl)
     if(resumeFile){
@@ -30,6 +31,7 @@ function App() {
       })
 
       if(!response.body) throw new Error('No response body')
+
       const reader = response.body.getReader()
       const decoder = new TextDecoder()
       let done = false
@@ -47,52 +49,68 @@ function App() {
   }
 
   return (
-    /* Main container, with full screen layout and flexbox */
-    <div className="min-h-screen flex flex-col bg-green-50 gap-6">
+    /* Main container with proper height constraints */
+    <div className="h-screen flex flex-col bg-green-50">
       <Navbar />
-      <div className=' flex flex-1'>
-      {/* Left Panel - Form */}
-        <div className='w-1/3 bg-white border border-gray-200 shadow-sm p-6 rounded-t-lg'>
-          <h1 className='text-2xl font-bold text-gray-800 mb-6'>Resume Tailoring System</h1>
-          <div className='space-y-4'>
-            <div>
+      
+      {/* Main content area with flex-1 and overflow hidden */}
+      <div className="flex flex-col lg:flex-row flex-1 gap-6 p-3 md:p-6 min-h-0">
+        
+        {/* Left Panel - Form with proper scrolling */}
+        <div className="w-full lg:w-96 lg:flex-shrink-0 flex-shrink-0 bg-white border border-gray-200 shadow-sm rounded-lg flex flex-col">
+          <div className="p-6 flex-shrink-0">
+            <h1 className="text-2xl font-bold text-gray-800 mb-6">Resume Tailoring System</h1>
+            
+            <div className="space-y-4">
+              <div>
                 <input
-                  type='url'
+                  type="url"
                   placeholder="Job Posting URL"
-                  className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all'
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                   value={jobUrl}
                   onChange={(e) => setJobUrl(e.target.value)}
                   required
                 />
+              </div>
+              
+              <div>
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all"
+                  onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
+                />
+              </div>
+              
+              <div>
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  onClick={handleSubmit}
+                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors font-medium"
+                >
+                  {loading ? 'Analyzing...' : 'Analyze'}
+                </button>
+              </div>
             </div>
-            <div>
-              <input
-                type='file'
-                accept='application/pdf'
-                className='className="w-full px-4 py-3 border border-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all"'
-                onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
-              />
-            </div>
-            <div>
-              <button type='submit' disabled={loading}
-              onClick={handleSubmit}
-              className='w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors font-medium'>
-                {loading ? 'Analyzing...' : 'Analyze'}
-              </button>
-            </div>
+            
+            {error && (
+              <div className="mt-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+                {error}
+              </div>
+            )}
           </div>
-          {error && <div className='mt-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg'>
-            {error}
-          </div>}
         </div>
-      
-      {/* Right Panel - Output */}
-        <div className='flex-1 p-6 min-h-0  flex flex-col'>
-          <div className='flex-1 bg-white rounded-lg shadow-sm border border-gray-200 p-6 overflow-auto'>
+
+        {/* Right Panel - Output with proper overflow handling */}
+        <div className="flex-1 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col min-h-0 lg:min-h-0">
+          <div className="flex-1 p-6 overflow-hidden flex flex-col">
             {output ? (
-              <Markdown>{output}</Markdown>
+              <div className="flex-1 overflow-y-auto prose max-w-none">
+                <Markdown>{output}</Markdown>
+              </div>
             ) : (
-              <div className="h-full flex items-center justify-center text-gray-500 text-center">
+              <div className="flex-1 flex items-center justify-center text-gray-500 text-center">
                 <div>
                   <div className="text-4xl mb-4">📄</div>
                   <p className="text-lg">Generated content will appear here after analysis</p>
@@ -103,7 +121,6 @@ function App() {
         </div>
       </div>
     </div>
-    
   )
 }
 
