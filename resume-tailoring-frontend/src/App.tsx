@@ -2,6 +2,7 @@ import { useState } from 'react'
 import './App.css'
 import Markdown from 'react-markdown'
 import Navbar from './components/Navbar'
+import { Check, Copy } from 'lucide-react'
 
 function App() {
   const [jobUrl, setJobUrl] = useState<string>('')
@@ -9,6 +10,18 @@ function App() {
   const [output, setOutput] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
+  const [copied, setCopied] = useState<boolean>(false)
+
+  const handleCopied = async () => {
+    try{
+      await navigator.clipboard.writeText(output)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000) // Reset copied state after 2 seconds
+    } catch(err) {
+      console.error('Failed to copy text: ', err)
+      setError('Failed to copy text to clipboard')
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -108,6 +121,15 @@ function App() {
             {output ? (
               <div className="flex-1 overflow-y-auto prose max-w-none">
                 <Markdown>{output}</Markdown>
+                <button
+                  onClick={handleCopied}
+                  className="mt-4 flex items-center gap-2 px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+                  disabled={copied}
+                  aria-label="Copy to clipboard"
+                >
+                  {copied ? <Check size={18} className="text-green-600" /> : <Copy size={18} />}
+                  {copied ? "Copied!" : "Copy"}
+                </button>
               </div>
             ) : (
               <div className="flex-1 flex items-center justify-center text-gray-500 text-center">
