@@ -120,16 +120,8 @@ function App() {
           <div className="flex-1 p-6 overflow-hidden flex flex-col">
             {output ? (
               <div className="flex-1 overflow-y-auto prose max-w-none">
+
                 <Markdown>{output}</Markdown>
-                <button
-                  onClick={handleCopied}
-                  className="mt-4 flex items-center gap-2 px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
-                  disabled={copied}
-                  aria-label="Copy to clipboard"
-                >
-                  {copied ? <Check size={18} className="text-green-600" /> : <Copy size={18} />}
-                  {copied ? "Copied!" : "Copy"}
-                </button>
               </div>
             ) : (
               <div className="flex-1 flex items-center justify-center text-gray-500 text-center">
@@ -140,6 +132,17 @@ function App() {
               </div>
             )}
           </div>
+          {output ? 
+                  <button
+                  onClick={handleCopied}
+                  className="mt-4 flex items-center gap-2 px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+                  disabled={copied}
+                  aria-label="Copy to clipboard"
+                >
+                  {copied ? <Check size={18} className="text-green-600" /> : <Copy size={18} />}
+                  {copied ? "Copied!" : "Copy"}
+                </button>
+              : null}
         </div>
       </div>
     </div>
