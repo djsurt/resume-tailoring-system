@@ -73,15 +73,15 @@ function App() {
           expanded ? 'w-80' : 'w-full lg:w-[420px]'
         }`}>
           <div className="bg-white/70 backdrop-blur-xl border border-white/20 shadow-xl shadow-black/5 rounded-2xl overflow-hidden h-full">
-            {/* Header */}
+
             <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
               <h1 className="text-xl font-semibold tracking-tight">Resume Tailoring</h1>
               <p className="text-blue-100 text-sm mt-1 font-medium">Optimize your resume for any job posting</p>
             </div>
             
-            {/* Form Content */}
+
             <div className="p-6 space-y-6 overflow-y-auto flex-1">
-              {/* Job URL Input */}
+
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-700 mb-3">
                   Job Posting URL
