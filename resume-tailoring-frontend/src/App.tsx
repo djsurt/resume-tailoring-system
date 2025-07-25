@@ -2,7 +2,7 @@ import { useState } from 'react'
 import './App.css'
 import Markdown from 'react-markdown'
 import Navbar from './components/Navbar'
-import { Check, Copy } from 'lucide-react'
+import { Check, Copy, Upload, Link, Maximize2, Minimize2 } from 'lucide-react'
 
 function App() {
   const [jobUrl, setJobUrl] = useState<string>('')
@@ -11,12 +11,13 @@ function App() {
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState<boolean>(false)
+  const [expanded, setExpanded] = useState<boolean>(false)
 
   const handleCopied = async () => {
     try{
       await navigator.clipboard.writeText(output)
       setCopied(true)
-      setTimeout(() => setCopied(false), 2000) // Reset copied state after 2 seconds
+      setTimeout(() => setCopied(false), 2000)
     } catch(err) {
       console.error('Failed to copy text: ', err)
       setError('Failed to copy text to clipboard')
@@ -62,87 +63,175 @@ function App() {
   }
 
   return (
-    /* Main container with proper height constraints */
-    <div className="h-screen flex flex-col bg-green-50">
+    <div className="h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex flex-col">
       <Navbar />
       
-      {/* Main content area with flex-1 and overflow hidden */}
-      <div className="flex flex-col lg:flex-row flex-1 gap-6 p-3 md:p-6 min-h-0">
+      <div className="flex flex-1 gap-8 p-6 lg:p-8 max-w-none mx-auto overflow-hidden">
         
-        {/* Left Panel - Form with proper scrolling */}
-        <div className="w-full lg:w-96 lg:flex-shrink-0 flex-shrink-0 bg-white border border-gray-200 shadow-sm rounded-lg flex flex-col">
-          <div className="p-6 flex-shrink-0">
-            <h1 className="text-2xl font-bold text-gray-800 mb-6">Resume Tailoring System</h1>
-            
-            <div className="space-y-4">
-              <div>
-                <input
-                  type="url"
-                  placeholder="Job Posting URL"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                  value={jobUrl}
-                  onChange={(e) => setJobUrl(e.target.value)}
-                  required
-                />
-              </div>
-              
-              <div>
-                <input
-                  type="file"
-                  accept="application/pdf"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all"
-                  onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
-                />
-              </div>
-              
-              <div>
-                <button 
-                  type="submit" 
-                  disabled={loading}
-                  onClick={handleSubmit}
-                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors font-medium"
-                >
-                  {loading ? 'Analyzing...' : 'Analyze'}
-                </button>
-              </div>
+        {/* Left Panel - Form */}
+        <div className={`flex-shrink-0 transition-all duration-300 ${
+          expanded ? 'w-80' : 'w-full lg:w-[420px]'
+        }`}>
+          <div className="bg-white/70 backdrop-blur-xl border border-white/20 shadow-xl shadow-black/5 rounded-2xl overflow-hidden h-full">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
+              <h1 className="text-xl font-semibold tracking-tight">Resume Tailoring</h1>
+              <p className="text-blue-100 text-sm mt-1 font-medium">Optimize your resume for any job posting</p>
             </div>
             
-            {error && (
-              <div className="mt-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
-                {error}
+            {/* Form Content */}
+            <div className="p-6 space-y-6 overflow-y-auto flex-1">
+              {/* Job URL Input */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Job Posting URL
+                </label>
+                <div className="relative">
+                  <Link className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                  <input
+                    type="url"
+                    placeholder="https://company.com/job-posting"
+                    className="w-full pl-12 pr-4 py-4 bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white outline-none transition-all duration-200 placeholder:text-gray-400"
+                    value={jobUrl}
+                    onChange={(e) => setJobUrl(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
-            )}
+              
+              {/* File Upload */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Resume (PDF)
+                </label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
+                    id="resume-upload"
+                  />
+                  <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-blue-300 hover:bg-blue-50/30 transition-all duration-200 cursor-pointer">
+                    <Upload className="mx-auto text-gray-400 mb-3" size={24} />
+                    <div className="text-sm">
+                      {resumeFile ? (
+                        <span className="text-blue-600 font-medium">{resumeFile.name}</span>
+                      ) : (
+                        <>
+                          <span className="text-gray-600 font-medium">Click to upload</span>
+                          <span className="text-gray-400"> or drag and drop</span>
+                        </>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">PDF files only</p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Submit Button */}
+              <button 
+                type="submit" 
+                disabled={loading || !jobUrl || !resumeFile}
+                onClick={handleSubmit}
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-xl hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-200 font-semibold shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 transform hover:-translate-y-0.5 disabled:transform-none disabled:shadow-none"
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    Analyzing...
+                  </div>
+                ) : (
+                  'Analyze Resume'
+                )}
+              </button>
+              
+              {/* Error Display */}
+              {error && (
+                <div className="p-4 bg-red-50 border border-red-100 text-red-700 rounded-xl text-sm">
+                  <div className="font-medium">Error</div>
+                  <div className="mt-1">{error}</div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Right Panel - Output with proper overflow handling */}
-        <div className="flex-1 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col min-h-0 lg:min-h-0">
-          <div className="flex-1 p-6 overflow-hidden flex flex-col">
-            {output ? (
-              <div className="flex-1 overflow-y-auto prose max-w-none">
-
-                <Markdown>{output}</Markdown>
-              </div>
-            ) : (
-              <div className="flex-1 flex items-center justify-center text-gray-500 text-center">
-                <div>
-                  <div className="text-4xl mb-4">📄</div>
-                  <p className="text-lg">Generated content will appear here after analysis</p>
-                </div>
-              </div>
-            )}
-          </div>
-          {output ? 
-                  <button
+        {/* Right Panel - Output */}
+        <div className={`transition-all duration-300 min-w-0 ${
+          expanded ? 'flex-1' : 'flex-1 lg:max-w-4xl'
+        }`}>
+          <div className="bg-white/70 backdrop-blur-xl border border-white/20 shadow-xl shadow-black/5 rounded-2xl h-full flex flex-col overflow-hidden relative group">
+            
+            {/* Action Buttons */}
+            {output && (
+              <div className="absolute top-6 right-6 z-20 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                {/* Expand/Collapse Button */}
+                <button
+                  onClick={() => setExpanded(!expanded)}
+                  className="p-2.5 rounded-lg bg-white/90 backdrop-blur-sm border border-gray-200/50 hover:bg-white hover:border-gray-300 hover:shadow-md transition-all duration-200"
+                  aria-label={expanded ? "Collapse panel" : "Expand panel"}
+                >
+                  {expanded ? (
+                    <Minimize2 size={16} className="text-gray-600" />
+                  ) : (
+                    <Maximize2 size={16} className="text-gray-600" />
+                  )}
+                </button>
+                
+                {/* Copy Button */}
+                <button
                   onClick={handleCopied}
-                  className="mt-4 flex items-center gap-2 px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+                  className="p-2.5 rounded-lg bg-white/90 backdrop-blur-sm border border-gray-200/50 hover:bg-white hover:border-gray-300 hover:shadow-md transition-all duration-200"
                   disabled={copied}
                   aria-label="Copy to clipboard"
                 >
-                  {copied ? <Check size={18} className="text-green-600" /> : <Copy size={18} />}
-                  {copied ? "Copied!" : "Copy"}
+                  {copied ? (
+                    <Check size={16} className="text-green-600" />
+                  ) : (
+                    <Copy size={16} className="text-gray-600" />
+                  )}
                 </button>
-              : null}
+              </div>
+            )}
+            
+            {/* Header */}
+            <div className="p-6 border-b border-gray-100/80 bg-gradient-to-r from-gray-50/50 to-slate-50/50 flex-shrink-0">
+              <h2 className="text-lg font-semibold text-gray-800 tracking-tight">
+                Tailored Resume Analysis
+              </h2>
+              <p className="text-sm text-gray-500 mt-1">
+                AI-generated recommendations and optimizations
+              </p>
+            </div>
+            
+            {/* Content - Scrollable */}
+            <div className="flex-1 min-h-0 overflow-hidden">
+              {output ? (
+                <div className="h-full overflow-y-auto">
+                  <div className="p-6">
+                    <div className="prose prose-slate max-w-none prose-headings:text-gray-800 prose-headings:font-semibold prose-p:text-gray-700 prose-p:leading-relaxed prose-li:text-gray-700 prose-strong:text-gray-800 prose-code:text-blue-600 prose-code:bg-blue-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-blockquote:border-blue-200 prose-blockquote:bg-blue-50/30 prose-blockquote:text-blue-800">
+                      <Markdown>{output}</Markdown>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="h-full flex items-center justify-center p-8">
+                  <div className="text-center max-w-md">
+                    <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center">
+                      <div className="text-3xl">📊</div>
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                      Ready to analyze
+                    </h3>
+                    <p className="text-gray-500 leading-relaxed">
+                      Upload your resume and job URL to get personalized recommendations and tailoring suggestions.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
