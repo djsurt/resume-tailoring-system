@@ -73,15 +73,15 @@ function App() {
           expanded ? 'w-80' : 'w-full lg:w-[420px]'
         }`}>
           <div className="bg-white/70 backdrop-blur-xl border border-white/20 shadow-xl shadow-black/5 rounded-2xl overflow-hidden h-full">
-
+            {/* Header */}
             <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
               <h1 className="text-xl font-semibold tracking-tight">Resume Tailoring</h1>
               <p className="text-blue-100 text-sm mt-1 font-medium">Optimize your resume for any job posting</p>
             </div>
             
-
+            {/* Form Content */}
             <div className="p-6 space-y-6 overflow-y-auto flex-1">
-
+              {/* Job URL Input */}
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-700 mb-3">
                   Job Posting URL
@@ -210,8 +210,59 @@ function App() {
               {output ? (
                 <div className="h-full overflow-y-auto">
                   <div className="p-6">
-                    <div className="prose prose-slate max-w-none prose-headings:text-gray-800 prose-headings:font-semibold prose-p:text-gray-700 prose-p:leading-relaxed prose-li:text-gray-700 prose-strong:text-gray-800 prose-code:text-blue-600 prose-code:bg-blue-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-blockquote:border-blue-200 prose-blockquote:bg-blue-50/30 prose-blockquote:text-blue-800">
-                      <Markdown>{output}</Markdown>
+                    <div className="prose prose-slate max-w-none 
+                      prose-headings:text-gray-900 prose-headings:font-bold prose-headings:tracking-tight
+                      prose-h1:text-3xl prose-h1:mb-8 prose-h1:pb-4 prose-h1:border-b prose-h1:border-gray-200
+                      prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-4 prose-h2:text-blue-800 prose-h2:bg-gradient-to-r prose-h2:from-blue-50 prose-h2:to-indigo-50 prose-h2:px-4 prose-h2:py-3 prose-h2:rounded-lg prose-h2:border prose-h2:border-blue-100
+                      prose-h3:text-lg prose-h3:mt-6 prose-h3:mb-3 prose-h3:text-gray-800 prose-h3:font-semibold
+                      prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-4
+                      prose-ul:space-y-2 prose-li:text-gray-700 prose-li:leading-relaxed
+                      prose-strong:text-gray-900 prose-strong:font-semibold
+                      prose-em:text-blue-700 prose-em:font-medium prose-em:not-italic
+                      prose-code:text-blue-700 prose-code:bg-blue-50 prose-code:px-2 prose-code:py-1 prose-code:rounded-md prose-code:text-sm prose-code:font-medium prose-code:border prose-code:border-blue-200
+                      prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:rounded-xl prose-pre:border prose-pre:border-gray-700
+                      prose-blockquote:border-l-4 prose-blockquote:border-blue-400 prose-blockquote:bg-blue-50/50 prose-blockquote:text-blue-900 prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:rounded-r-lg prose-blockquote:my-6
+                      prose-a:text-blue-600 prose-a:font-medium prose-a:no-underline hover:prose-a:underline
+                      [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+                      <Markdown
+                        components={{
+                          h2: ({children}) => (
+                            <h2 className="flex items-center gap-3 text-xl font-bold text-blue-800 bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-3 rounded-lg border border-blue-100 mt-8 mb-4">
+                              <span className="text-blue-600">▶</span>
+                              {children}
+                            </h2>
+                          ),
+                          h3: ({children}) => (
+                            <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-800 mt-6 mb-3 pb-2 border-b border-gray-200">
+                              <span className="w-1 h-4 bg-blue-500 rounded-full"></span>
+                              {children}
+                            </h3>
+                          ),
+                          ul: ({children}) => (
+                            <ul className="space-y-3 my-4">
+                              {children}
+                            </ul>
+                          ),
+                          li: ({children}) => (
+                            <li className="flex items-start gap-3 text-gray-700 leading-relaxed">
+                              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
+                              <span>{children}</span>
+                            </li>
+                          ),
+                          strong: ({children}) => (
+                            <strong className="font-semibold text-gray-900 bg-yellow-100 px-1 py-0.5 rounded">
+                              {children}
+                            </strong>
+                          ),
+                          code: ({children}) => (
+                            <code className="text-blue-700 bg-blue-50 px-2 py-1 rounded-md text-sm font-medium border border-blue-200">
+                              {children}
+                            </code>
+                          )
+                        }}
+                      >
+                        {output}
+                      </Markdown>
                     </div>
                   </div>
                 </div>
