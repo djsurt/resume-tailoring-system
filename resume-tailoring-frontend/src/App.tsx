@@ -13,6 +13,9 @@ function App() {
   const [copied, setCopied] = useState<boolean>(false)
   const [expanded, setExpanded] = useState<boolean>(false)
 
+  /**
+   * Handles copying the resume recommendations to the clipboard.
+   */
   const handleCopied = async () => {
     try{
       await navigator.clipboard.writeText(output)
@@ -24,6 +27,10 @@ function App() {
     }
   }
 
+  /**
+   * Handles form submission.
+   * @param e The act of submitting the form.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setOutput('')
@@ -39,7 +46,7 @@ function App() {
     }
 
     try{
-      const response = await fetch('http://127.0.0.1:8000/analyze/', {
+      const response = await fetch('http://127.0.0.1:8000/analyze/tailor', {
         method: 'POST',
         body: formData,
       })

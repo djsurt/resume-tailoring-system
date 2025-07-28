@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import requests
 from bs4 import BeautifulSoup
 import pdfplumber
+from utils.resume_utils import read_resume_from_upload
 from mistralai import Mistral
 
 load_dotenv()
@@ -42,27 +43,6 @@ app.add_middleware(
     allow_methods=["*"], # Allows all methods (GET, POST, etc.)
     allow_headers=["*"], # Allows all headers
 )
-
-async def read_resume_from_upload(file: UploadFile) -> list[str]:
-    """
-    Reads the resume from an uploaded file in memory and extracts text content
-    """
-    try:
-        #Read the file content into a bytes buffer
-        pdf_bytes = await file.read()
-
-        resume_text = ""
-        with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
-            for page in pdf.pages:
-                text = page.extract_text()
-                if text:
-                    resume_text += text + "\n"
-        lines = resume_text.splitlines()
-
-        return [line.strip() for line in lines if line.strip()] # Removing empty lines
-    except Exception as e:
-        print(f"Error reading resume: {e}")
-        raise HTTPException(status_code=400, detail=f"Could not read the provided PDF file. Error: {e}")
     
 async def stream_analysis_from_mistral(job_content: str, resume_text: str | None) -> str:
     """
@@ -133,7 +113,7 @@ async def root():
     """
     return {"message": "Welcome to the Resume Tailoring System API!"}
 
-@app.post("/analyze/")
+@app.post("/analyze/tailor/")
 async def analyze_job_and_resume(
     job_url: str = Form(...),
     resume: UploadFile = File(None)
@@ -162,6 +142,17 @@ async def analyze_job_and_resume(
         stream_analysis_from_mistral(job_content=job_content, resume_text=resume_text),
         media_type="text/event-stream"
     )
+
+@app.post("/analyze/ats/")
+async def analyze_ats_score(
+    resume: UploadFile = File(None)
+):
+    """
+    Function to analyze if a resume is ATS friendly and provide an ATS score
+    """
+    pass
+
+
 
 if __name__ == "__main__":
     print("Starting FastAPI server...")
