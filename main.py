@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import requests
 from bs4 import BeautifulSoup
 import pdfplumber
-from utils.resume_utils import read_resume_from_upload
+from .utils.resume_utils import read_resume_from_upload
 from mistralai import Mistral
 
 load_dotenv()
@@ -51,9 +51,10 @@ async def stream_analysis_from_mistral(job_content: str, resume_text: str | None
     """
 
     prompt = f"""
-        You are an expert in resume tailoring for software engineering and other technical roles.
+        You are an expert in resume tailoring for software engineering and other tech related roles.
 
-        Please analyze the job posting and current resume provided. Give specific, actionable feedback to tailor the resume effectively for this position. Focus on skills, technologies, accomplishments, and keywords that matter for technical hiring.
+        Please analyze the job posting and current resume provided. Give the current resume a percentage rating depending on how many key words it has which are related to the job posting.
+        Then, provide advice on more keywords that the user can include and also how they could improve things on their resume to match the job posting.
 
         Format the entire output in Markdown.
 
@@ -66,7 +67,7 @@ async def stream_analysis_from_mistral(job_content: str, resume_text: str | None
         Please return:
 
         ### 1. Core Technical Skills & Qualifications Required
-        List the main programming languages, tools, frameworks, systems, or certifications mentioned.
+        List the main programming languages, tools, frameworks, systems, or certifications mentioned. Please list them as bullet points and be concise.
 
         ### 2. Critical Keywords & Phrases to Include
         Extract high-impact terms and acronyms to match applicant tracking systems (ATS).
@@ -74,13 +75,10 @@ async def stream_analysis_from_mistral(job_content: str, resume_text: str | None
         ### 3. Must-Have Experience or Background
         Note any specific years of experience, domains (e.g., fintech, cloud), or project types expected.
 
-        ### 4. Valued Soft Skills (Only if emphasized)
-        Include only those soft skills that appear directly in the job posting.
-
-        ### 5. Tailoring Recommendations
-        * **Resume Sections:** Which sections to emphasize or reorder.
+        ### 4. Tailoring Recommendations
+        * **Current Rating:** Give a rating from 0 to 100 on how this resume fares compared to this job posting. (required)
+        * **Resume Sections:** Which sections to emphasize or reorder. (optional)
         * **Bullet Points:** Specific bullet points to revise or add. Use metrics.
-        * **Language:** How to mirror the job posting's language.
         * **Content to Remove:** What to downplay or remove.
     """
     try:
@@ -150,6 +148,7 @@ async def analyze_ats_score(
     """
     Function to analyze if a resume is ATS friendly and provide an ATS score
     """
+    resume_content = resume.read()
     pass
 
 
