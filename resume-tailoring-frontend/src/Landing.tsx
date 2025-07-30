@@ -9,7 +9,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Sparkles className="h-8 w-8 text-purple-600" />
-            <span className="text-2xl font-bold text-gray-900">ResumeAI</span>
+            <span className="text-2xl font-bold text-gray-900">TailResume</span>
           </div>
           <div className="hidden md:flex items-center space-x-8">
             <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
@@ -44,9 +44,6 @@ export default function Landing() {
               <span>Start Tailoring Now</span>
               <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <button className="border-2 border-gray-300 text-gray-700 hover:text-gray-900 hover:border-gray-400 px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 hover:bg-gray-50">
-              Watch Demo
-            </button>
           </div>
 
           {/* Value Props */}
@@ -133,7 +130,7 @@ export default function Landing() {
               <div className="bg-purple-200 w-8 h-0.5 mx-auto mb-6"></div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Upload Resume</h3>
               <p className="text-gray-600 leading-relaxed">
-                Upload your existing resume and paste the job description you're applying for.
+                Upload your existing resume and paste the job application link you're applying for.
               </p>
             </div>
 
@@ -178,14 +175,6 @@ export default function Landing() {
             </Link>
           </div>
 
-          <div className="flex items-center justify-center space-x-2 mt-8 text-purple-200">
-            <div className="flex space-x-1">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="h-5 w-5 fill-yellow-300 text-yellow-300" />
-              ))}
-            </div>
-            <span>Built with Mistral AI technology</span>
-          </div>
         </div>
       </section>
 
@@ -194,7 +183,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto text-center">
           <div className="flex items-center justify-center space-x-2 mb-6">
             <Sparkles className="h-8 w-8 text-purple-600" />
-            <span className="text-2xl font-bold text-gray-900">ResumeAI</span>
+            <span className="text-2xl font-bold text-gray-900">TailResume</span>
           </div>
           <p className="text-gray-600">
             Powered by Mistral AI • Tailoring resumes for success
