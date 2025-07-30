@@ -1,2 +1,1 @@
-# resume-tailoring-system
-A way to level up applying to different companies. What if you have a general resume that needs to be tailored to a specific job description? Look no further! This system will help you tailot your resume to your dream job!
+# interview-prep
