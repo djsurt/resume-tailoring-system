@@ -1,4 +1,4 @@
-import { Sparkles, Home, FileText } from 'lucide-react';
+import { Sparkles, Home, FileText, FolderOpen } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 export default function Navbar() {
@@ -40,6 +40,18 @@ export default function Navbar() {
               <span>Analyze Resume</span>
             </Link>
             
+            <Link
+              to="/storage"
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+                location.pathname === '/storage'
+                  ? 'bg-green-100 text-green-700 font-medium'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+              }`}
+            >
+              <FolderOpen size={18} />
+              <span>My Resumes</span>
+            </Link>
+            
             {/* CTA Button */}
             <Link
               to="/analyze"
@@ -47,6 +59,7 @@ export default function Navbar() {
             >
               Get Started
             </Link>
+            
           </div>
         </div>
       </div>

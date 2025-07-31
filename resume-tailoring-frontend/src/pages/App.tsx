@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import './App.css'
+import '../App.css'
 import Markdown from 'react-markdown'
-import Navbar from './components/Navbar'
+import Navbar from '../components/Navbar'
 import { Check, Copy, Upload, Link, Maximize2, Minimize2 } from 'lucide-react'
 
 function App() {
