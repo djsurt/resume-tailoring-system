@@ -1,14 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Navbar from "../components/Navbar";
 
-export default function ResumeStorage(){
-
+export default function ResumeStorage() {
     const [resumes, setResumes] = useState<string[]>([]);
+    const [showModal, setShowModal] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [dragActive, setDragActive] = useState(false);
+    const inputRef = useRef<HTMLInputElement | null>(null);
 
-    function getResumes(): string[]{
+    function getResumes(): string[] {
         // TODO: Implement actual resume fetching logic
-        // For now, return mock data
-        return ['Resume 1', 'Resume 2', 'Resume 3'];
+        return [];
     }
 
     useEffect(() => {
@@ -16,12 +18,50 @@ export default function ResumeStorage(){
         setResumes(resumeList);
     }, []);
 
+    // Handle file drop
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(false);
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            setSelectedFile(e.dataTransfer.files[0]);
+        }
+    };
+
+    // Handle file selection
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setSelectedFile(e.target.files[0]);
+        }
+    };
+
+    // Handle drag events
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(true);
+    };
+    const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(false);
+    };
+
+    // Handle upload (stub for AWS S3)
+    const handleUpload = async () => {
+        if (!selectedFile) return;
+        // TODO: Upload to AWS S3 here
+        alert(`Uploading: ${selectedFile.name}`);
+        setShowModal(false);
+        setSelectedFile(null);
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
-            <Navbar/>
+            <Navbar />
             <div className="container mx-auto px-4 py-8">
                 <h1 className="text-3xl font-bold text-gray-900 mb-8">My Resumes</h1>
-                
+
                 {resumes.length === 0 ? (
                     <div className="text-center py-12">
                         <p className="text-gray-500 text-lg">No resumes found. Upload your first resume to get started!</p>
@@ -50,13 +90,64 @@ export default function ResumeStorage(){
                         ))}
                     </div>
                 )}
-                
+
                 <div className="mt-8 text-center">
-                    <button className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                    <button
+                        className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium"
+                        onClick={() => setShowModal(true)}
+                    >
                         + Upload New Resume
                     </button>
                 </div>
             </div>
+
+            {/* Modal for Upload */}
+            {showModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative">
+                        <button
+                            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-2xl"
+                            onClick={() => { setShowModal(false); setSelectedFile(null); }}
+                        >
+                            &times;
+                        </button>
+                        <h2 className="text-xl font-semibold mb-4">Upload Resume</h2>
+                        <div
+                            className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${dragActive ? "border-green-500 bg-green-50" : "border-gray-300 bg-gray-50"}`}
+                            onDrop={handleDrop}
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
+                            onClick={() => inputRef.current?.click()}
+                        >
+                            <input
+                                type="file"
+                                accept="application/pdf"
+                                className="hidden"
+                                ref={inputRef}
+                                onChange={handleFileChange}
+                            />
+                            {selectedFile ? (
+                                <div>
+                                    <p className="font-medium">{selectedFile.name}</p>
+                                    <p className="text-sm text-gray-500">{(selectedFile.size / 1024).toFixed(1)} KB</p>
+                                </div>
+                            ) : (
+                                <div>
+                                    <p className="text-gray-600">Drag & drop your PDF here, or <span className="text-green-600 underline">browse</span></p>
+                                    <p className="text-xs text-gray-400 mt-2">PDF only, max 5MB</p>
+                                </div>
+                            )}
+                        </div>
+                        <button
+                            className="mt-6 w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50"
+                            disabled={!selectedFile}
+                            onClick={handleUpload}
+                        >
+                            Upload
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
