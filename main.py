@@ -1,5 +1,4 @@
 import os
-import io
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, Form, File, UploadFile, HTTPException
@@ -7,11 +6,23 @@ from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 import requests
 from bs4 import BeautifulSoup
-import pdfplumber
+import boto3
+from botocore.config import Config
 from .utils.resume_utils import read_resume_from_upload
 from mistralai import Mistral
-
+from fastapi import Query
 load_dotenv()
+
+s3 = boto3.client(
+    's3',
+    region_name=os.getenv("AWS_REGION"),
+    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+    config=Config(signature_version="s3v4")
+)
+BUCKET = os.getenv("S3_BUCKET_NAME")
+if not BUCKET:
+    raise RuntimeError("S3_BUCKET_NAME environment variable not set.")
 
 app = FastAPI(
     title="Resume Tailoring System",
@@ -43,7 +54,31 @@ app.add_middleware(
     allow_methods=["*"], # Allows all methods (GET, POST, etc.)
     allow_headers=["*"], # Allows all headers
 )
-    
+
+@app.get("/s3/presign")
+def get_presigned_put_url(
+    filename: str = Query(..., description="Target filename, e.g. my.pdf"),
+    content_type: str = Query("application/pdf", description="MIME type")
+):
+    """
+    Returns a presigned URL for uploading a file to S3.
+    """
+    key = f"resumes/{filename}"
+    try:
+        url = s3.generate_presigned_url(
+            ClientMethod = 'put_object',
+            Params ={
+                'Bucket': BUCKET,
+                'Key': key,
+                'ContentType': content_type,
+                'ACL': 'private'  # Ensure the uploaded file is private
+            },
+            ExpiresIn = 60 * 10
+        )
+        return {"url": url, "key": key, "bucket": BUCKET}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating presigned URL: {e}")   
+ 
 async def stream_analysis_from_mistral(job_content: str, resume_text: str | None) -> str:
     """
     An async generator that streams analysis from the Mistral API.
