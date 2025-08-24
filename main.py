@@ -56,29 +56,18 @@ app.add_middleware(
 )
 
 @app.get("/s3/presign")
-def get_presigned_put_url(
-    filename: str = Query(..., description="Target filename, e.g. my.pdf"),
-    content_type: str = Query("application/pdf", description="MIME type")
-):
-    """
-    Returns a presigned URL for uploading a file to S3.
-    """
-    key = f"resumes/{filename}"
-    try:
-        url = s3.generate_presigned_url(
-            ClientMethod = 'put_object',
-            Params ={
-                'Bucket': BUCKET,
-                'Key': key,
-                'ContentType': content_type,
-                'ACL': 'private'  # Ensure the uploaded file is private
-            },
-            ExpiresIn = 60 * 10
-        )
-        return {"url": url, "key": key, "bucket": BUCKET}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error generating presigned URL: {e}")   
- 
+def get_presigned_put_url(filename: str = Query(...), content_type: str = Query("application/pdf")):
+    from urllib.parse import quote
+    safe_name = filename.strip().replace("\\", "/")
+    key = quote(f"resumes/{safe_name}", safe="/")
+
+    url = s3.generate_presigned_url(
+        "put_object",
+        Params={"Bucket": BUCKET, "Key": key, "ContentType": content_type},
+        ExpiresIn=600,
+    )
+    return {"url": url, "key": key, "bucket": BUCKET}
+
 async def stream_analysis_from_mistral(job_content: str, resume_text: str | None) -> str:
     """
     An async generator that streams analysis from the Mistral API.

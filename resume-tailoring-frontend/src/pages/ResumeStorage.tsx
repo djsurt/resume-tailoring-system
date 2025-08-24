@@ -49,12 +49,46 @@ export default function ResumeStorage() {
 
     // Handle upload (stub for AWS S3)
     const handleUpload = async () => {
-        if (!selectedFile) return;
-        // TODO: Upload to AWS S3 here
-        alert(`Uploading: ${selectedFile.name}`);
+    if (!selectedFile) return;
+
+    try {
+        // 1) Ask backend for pre-signed URL
+        const params = new URLSearchParams({
+        filename: selectedFile.name,
+        content_type: selectedFile.type || "application/pdf",
+        });
+
+        // If your FastAPI runs on a different origin in dev, use the full URL:
+        // const presignRes = await fetch(`http://127.0.0.1:8000/s3/presign?${params}`);
+        const presignRes = await fetch(`/s3/presign?${params}`);
+        if (!presignRes.ok) throw new Error("Failed to get presigned URL");
+        const { url, key, bucket } = await presignRes.json();
+
+        // 2) Upload directly to S3 (PUT)
+        const putRes = await fetch(url, {
+        method: "PUT",
+        headers: { "Content-Type": selectedFile.type || "application/pdf" },
+        body: selectedFile,
+        });
+        if (!putRes.ok) throw new Error("Upload to S3 failed");
+
+        // 3) (Optional) derive a view URL if you serve public content.
+        // If the bucket is private (recommended), store `key` in your DB
+        // and serve via a signed GET in your backend when viewing.
+        // const publicUrl = `https://${bucket}.s3.amazonaws.com/${key}`;
+
+        alert("Upload successful!");
         setShowModal(false);
         setSelectedFile(null);
+
+        // TODO: refresh your list or store the key for later retrieval
+        // setResumes(prev => [...prev, selectedFile.name]);
+
+    } catch (err: any) {
+        alert(err.message || "Upload failed");
+    }
     };
+
 
     return (
         <div className="min-h-screen bg-gray-50">
